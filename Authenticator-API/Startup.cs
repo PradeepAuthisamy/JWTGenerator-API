@@ -45,6 +45,16 @@ namespace Authenticator_API
                     ValidateAudience = false
                 };
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
             services.AddScoped<IAuthenticatorService, AuthenticatorService>();
             services.AddControllers();
         }
@@ -52,7 +62,7 @@ namespace Authenticator_API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsProduction())
             {
                 app.UseDeveloperExceptionPage();
             }

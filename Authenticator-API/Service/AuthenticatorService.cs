@@ -31,7 +31,7 @@ namespace Authenticator_API.Service
                                     SELECT TOP (1000) [Id]
                                     ,[UserName]
                                     ,[PasswordHash]
-                              FROM [Employee].[dbo].[AspNetUsers]";
+                              FROM [EmployeeDetails].[dbo].[AspNetUsers]";
             reader = sqlComm.ExecuteReader();
         }
 
