@@ -2,6 +2,7 @@
 using Authenticator_API.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Authenticator_API.Controllers
 {
@@ -18,16 +19,15 @@ namespace Authenticator_API.Controllers
 
         [HttpPost("Authenticate")]
         [AllowAnonymous]
-        public IActionResult Authenticate([FromBody] UserCredential userCredential)
+        public async Task<IActionResult> Authenticate([FromBody] UserCredential userCredential)
         {
-            if (string.IsNullOrEmpty(userCredential.UserName) &&
-               string.IsNullOrEmpty(userCredential.Password))
+            if (string.IsNullOrEmpty(userCredential.UserName))
             {
-                return BadRequest("Please provide username and password");
+                return BadRequest("Please provide username");
             };
 
-            var token = _authenticationService.
-                            GenerateToken(userCredential.UserName, userCredential.Password);
+            var token = await _authenticationService.
+                            GenerateTokenAsync(userCredential.UserName);
             return Ok(token);
         }
     }

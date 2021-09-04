@@ -1,5 +1,6 @@
 ﻿using Authenticator_API.Model;
 using Authenticator_API.Service.Interface;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,29 +9,44 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Authenticator_API.Service
 {
     public class AuthenticatorService : IAuthenticatorService
     {
         private readonly IConfiguration _config;
-
-        private Dictionary<string, string> UserDB = new Dictionary<string, string>
-        {
-            {"Test@123","Test123" }
-        };
+        private readonly SqlDataReader reader;
+        private readonly SqlCommand sqlComm = new();
+        private readonly SqlConnection sqlConn = new();
+        private readonly List<string> Users = new();
 
         public AuthenticatorService(IConfiguration config)
         {
             _config = config;
+            sqlConn.ConnectionString = config.GetConnectionString("EmployeeInfo");
+            sqlConn.Open();
+            sqlComm.Connection = sqlConn;
+            sqlComm.CommandText = @"/****** Script for SelectTopNRows command from SSMS  ******/
+                                    SELECT TOP (1000) [Id]
+                                    ,[UserName]
+                                    ,[PasswordHash]
+                              FROM [Employee].[dbo].[AspNetUsers]";
+            reader = sqlComm.ExecuteReader();
         }
 
-        public string GenerateToken(string userName, string passWord)
+        public async Task<string> GenerateTokenAsync(string userName)
         {
+            if (reader.HasRows)
+            {
+                while (await reader.ReadAsync())
+                {
+                    Users.Add(reader["UserName"].ToString());
+                }
+            }
             var jwtAppSettingsSection = _config.GetSection("JWT");
             var jwtAppSettings = jwtAppSettingsSection.Get<JWTAppSettings>();
-            var userExists = UserDB.Any(user => user.Key == userName &&
-                                        user.Value == passWord);
+            var userExists = Users.Any(user => user == userName);
 
             if (!userExists)
             {

@@ -1,7 +1,9 @@
-﻿namespace Authenticator_API.Service.Interface
+﻿using System.Threading.Tasks;
+
+namespace Authenticator_API.Service.Interface
 {
     public interface IAuthenticatorService
     {
-        string GenerateToken(string userName, string passWord);
+        Task<string> GenerateTokenAsync(string userName);
     }
 }
