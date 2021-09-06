@@ -31,7 +31,7 @@ namespace Authenticator_API.Service
                                     SELECT TOP (1000) [Id]
                                     ,[UserName]
                                     ,[PasswordHash]
-                              FROM [Employees].[dbo].[AspNetUsers]";
+                              FROM [Rims].[dbo].[AspNetUsers]";
             reader = sqlComm.ExecuteReader();
         }
 
@@ -63,7 +63,7 @@ namespace Authenticator_API.Service
                     {
                         new Claim(ClaimTypes.Name, userName)
                     }),
-                Expires = DateTime.UtcNow.AddMinutes(10),
+                Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                                      SecurityAlgorithms.HmacSha256)
             };
